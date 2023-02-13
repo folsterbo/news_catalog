@@ -22,9 +22,9 @@
         return {
             menuItems: [
                 {
-                    name: 'rubriki',
+                    name: 'rubrics',
                     title: 'Рубрики',
-                    url: '/rubriki',
+                    url: '/rubrics',
                 },
                 {
                     name: 'news',

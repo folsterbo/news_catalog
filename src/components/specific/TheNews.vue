@@ -4,7 +4,7 @@
 
 <script>
 export default {
-    name: 'NewsPortal',
+    name: 'TheNews',
     components: {  },
     data: function () {
         return {

@@ -4,7 +4,7 @@
 
 <script>
 export default {
-    name: 'NewsPanel',
+    name: 'TheRubrics',
     components: {  },
     data: function () {
         return {
