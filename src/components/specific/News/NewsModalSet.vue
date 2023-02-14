@@ -13,7 +13,7 @@
                 ></news-modal-view>
                 <news-modal-delete class="news-modal-delete"
                     @modal-close-btn-clicked="$emit('modal-close-btn-clicked')"
-                    @modal-delete-btn-clicked="$emit('modal-delete-btn-clicked')"
+                    @modal-delete-btn-clicked="modalDeleteRecordSuccessHandler"
                     v-if="isDeleteMode"
                     :id="id"
                     :modalMaskClick="modalMaskClick"
@@ -72,6 +72,10 @@ export default {
         },
         setDeleteMode() {
             this.modalMode = 'delete'
+        },
+        modalDeleteRecordSuccessHandler() {
+            this.$emit('modal-close-btn-clicked');
+            this.$emit('data-changes');
         },
     },
 }

@@ -72,7 +72,7 @@ export default {
                 this.requestRoute,
             ).then(response => {
                 if (response.data?.success) {
-                    this.$emit('modal-close-btn-clicked');
+                    this.$emit('modal-delete-btn-clicked');
                 } else {
                     console.log(response?.data);
                 }

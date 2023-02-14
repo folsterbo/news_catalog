@@ -81,7 +81,7 @@
         </v-row>
         <news-modal-set
             @modal-close-btn-clicked="closeModal"
-            @modal-delete-btn-clicked="deleteAlrticle"
+            @data-changes="updateData"
             :is-modal-visible="isModalVisible"
             :mode.sync="modalMode"
             :id="lastClickedArticleId"
@@ -158,10 +158,6 @@ export default {
         },
         closeModal() {
             this.isModalVisible = false;
-        },
-        deleteAlrticle() {
-            this.isModalVisible = false;
-            this.updateData();
         },
     },
     created() {
