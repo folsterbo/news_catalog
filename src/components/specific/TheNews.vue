@@ -72,11 +72,86 @@
             <v-col cols="4">
                 <v-toolbar
                     flat
-                >            
-                    <v-btn text @click="createRecord">
+                >
+                    <v-spacer></v-spacer>
+                    <v-btn
+                        text
+                        @click="openForm">
                         Добавить новость
                     </v-btn>
                 </v-toolbar>
+                <div v-if="this.isFormOpen" class="add-news-form">
+                    <v-form>
+                        <v-container>
+                            <v-text-field
+                                v-model="newsHeader"
+                                label="Заголовок"
+                                required
+                            ></v-text-field>
+
+                            <v-text-field
+                                v-model="newsAnnouncement"
+                                label="Анонс"
+                                required
+                            ></v-text-field>
+
+                            <v-text-field
+                                v-model="newsBody"
+                                label="Текст"
+                                required
+                            ></v-text-field>
+
+                            <v-select
+                                multiple
+                                v-model="rubricsId"
+                                label="Рубрика"
+                                :items="arr"
+                            >
+                            </v-select>
+                        </v-container>
+                    </v-form>
+
+                    <v-toolbar
+                        flat
+                    >
+                        <v-spacer></v-spacer>
+                        <v-btn
+                            text
+                            small
+                            @click="cancelForm">
+                            Отмена
+                        </v-btn>
+                        <v-btn
+                            text
+                            small
+                            @click="clearForm">
+                            Очистить
+                        </v-btn>
+                        <v-btn
+                            text
+                            small
+                            @click="createRecord">
+                            Сохранить
+                        </v-btn>
+                    </v-toolbar>
+
+                    <div v-if="isUpdateError">
+                        <v-alert
+                            colored-border
+                            type="error"
+                            elevation="2"
+                            >
+                            <v-list-item-content>
+                                <v-list-item-title>{{errorMsg}}</v-list-item-title>
+                                <li
+                                    v-for="error in errors"
+                                    :key="error.id"
+                                >{{ error }}</li>
+                            </v-list-item-content>
+                        </v-alert>
+                    </div>
+
+                </div>
             </v-col>
         </v-row>
         <news-modal-set
@@ -98,22 +173,62 @@ export default {
     components: { NewsModalSet },
     data: function () {
         return {
+            arr: [],
             newsData: [],
             searchStr: '',
-            addData: {
-                id: 0,
-                news_header: 'заголовок',
-                news_announcement: 'анонс',
-                news_body: 'Lorem, ipsum dolor sit amet consectetur adipisicing elit. Nostrum quod ratione velit, nam commodi libero beatae sapiente impedit modi dolores doloremque earum deleniti quis veritatis adipisci consectetur accusamus labore nihil.',
+            isFormOpen: false,
+            articleData: {
+                news_header: '',
+                news_announcement: '',
+                news_body: '',
+                rubrics_id: [],
             },
+            isUpdateError: false,
             lastClickedArticleId: 0,
             isModalVisible: false,
             modalMode: 'view',
+            errorMsg: '',
+            errors: {},
         }
     },
     computed: {
         requestRoute: function () {
             return 'http://localhost/api/news/';
+        },
+        requestRubricsRoute: function () {
+            return 'http://localhost/api/news/rubrics';
+        },
+        newsHeader: {
+            get: function () {
+                return this.articleData?.news_header ?? '';
+            },
+            set: function (newVal) {
+                this.articleData.news_header = newVal;
+            },
+        },
+        newsAnnouncement: {
+            get: function () {
+                return this.articleData?.news_announcement ?? '';
+            },
+            set: function (newVal) {
+                this.articleData.news_announcement = newVal;
+            },
+        },
+        newsBody: {
+            get: function () {
+                return this.articleData?.news_body ?? '';
+            },
+            set: function (newVal) {
+                this.articleData.news_body = newVal;
+            },
+        },
+        rubricsId: {
+            get: function () {
+                return this.articleData?.rubrics_id ?? '';
+            },
+            set: function (newVal) {
+                this.articleData.rubrics_id = newVal;
+            },
         },
     },
     methods: {
@@ -129,17 +244,55 @@ export default {
             }).catch(error => {
                 console.log(error);
             });
+
+            this.axios.get(
+                this.requestRubricsRoute,
+            ).then(response => {
+                if (response.data?.success) {
+                    const items = response?.data?.items;
+                    //response?.data?.items.map(item => item.rubric_name[item.id]);
+                    for (let i = 0; i < items.length; i++) {
+                        this.arr[i] = {text: items[i].rubric_name, value: items[i].id,}
+                    }
+                } else {
+                    console.log(response?.data);
+                }
+            }).catch(error => {
+                console.log(error);
+            });
+        },
+        openForm() {
+            this.isFormOpen=true;
+        },
+        clearForm() {
+            this.isUpdateError = false;
+            this.newsHeader = '';
+            this.newsAnnouncement = '';
+            this.newsBody = '';
+            this.rubricsId = [];
+        },
+        cancelForm() {
+            this.isFormOpen = false;
+            this.isUpdateError = false;
+            this.newsHeader = '';
+            this.newsAnnouncement = '';
+            this.newsBody = '';
+            this.rubricsId = [];
         },
         createRecord() {
-            const url  = this.requestRoute;
-            const data = this.addData;
+            const url       = this.requestRoute;
+            const data      = this.articleData;
 
             this.axios.post(url,
                 { data },
             ).then(response => {
                 if (response.data?.success) {
-                    this.$emit('modal-create-record-success', response?.data?.payload);
+                    this.isFormOpen = false;
+                    this.updateData();
                 } else {
+                    this.isUpdateError = true;
+                    this.errorMsg      = response?.data.message;
+                    this.errors        = response?.data.errors;
                     console.log(response?.data);
                 }
             }).catch(error => {
@@ -168,5 +321,7 @@ export default {
 </script>
 
 <style  lang="scss">
-
+.add-news-form {
+    width: 400px;
+}
 </style>

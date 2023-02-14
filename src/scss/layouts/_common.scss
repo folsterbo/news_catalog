@@ -25,6 +25,9 @@
   .v-card__actions {
     justify-content: space-between;
   }
+  .col {
+    min-width: fit-content;
+  }
 }
 // block
 .block {
