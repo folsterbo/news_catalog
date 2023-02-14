@@ -30,7 +30,10 @@
                             <v-icon>mdi-pencil</v-icon>
                         </v-btn>
 
-                        <v-btn icon>
+                        <v-btn
+                            icon
+                            @click="setDeleteAlrticle(item.id)"
+                        >
                             <v-icon>mdi-trash-can-outline</v-icon>
                         </v-btn>
                     </v-toolbar>
@@ -58,7 +61,7 @@
                                 color="green"
                                 small
                                 text
-                                @click="articleClickEvent(item.id)"
+                                @click="setViewAlrticle(item.id)"
                             >
                                 Просмотр
                             </v-btn>
@@ -78,6 +81,7 @@
         </v-row>
         <news-modal-set
             @modal-close-btn-clicked="closeModal"
+            @modal-delete-btn-clicked="deleteAlrticle"
             :is-modal-visible="isModalVisible"
             :mode.sync="modalMode"
             :id="lastClickedArticleId"
@@ -98,9 +102,9 @@ export default {
             searchStr: '',
             addData: {
                 id: 0,
-                news_header: '',
-                news_announcement: '',
-                news_body: '',
+                news_header: 'заголовок',
+                news_announcement: 'анонс',
+                news_body: 'Lorem, ipsum dolor sit amet consectetur adipisicing elit. Nostrum quod ratione velit, nam commodi libero beatae sapiente impedit modi dolores doloremque earum deleniti quis veritatis adipisci consectetur accusamus labore nihil.',
             },
             lastClickedArticleId: 0,
             isModalVisible: false,
@@ -142,13 +146,22 @@ export default {
                 console.log(error);
             });
         },
-        articleClickEvent(id) {
+        setViewAlrticle(id) {
             this.lastClickedArticleId = id;
             this.modalMode      = 'view';
             this.isModalVisible = true;
         },
+        setDeleteAlrticle(id) {
+            this.lastClickedArticleId = id;
+            this.modalMode      = 'delete';
+            this.isModalVisible = true;
+        },
         closeModal() {
             this.isModalVisible = false;
+        },
+        deleteAlrticle() {
+            this.isModalVisible = false;
+            this.updateData();
         },
     },
     created() {

@@ -11,6 +11,13 @@
                     :id="id"
                     :modalMaskClick="modalMaskClick"
                 ></news-modal-view>
+                <news-modal-delete class="news-modal-delete"
+                    @modal-close-btn-clicked="$emit('modal-close-btn-clicked')"
+                    @modal-delete-btn-clicked="$emit('modal-delete-btn-clicked')"
+                    v-if="isDeleteMode"
+                    :id="id"
+                    :modalMaskClick="modalMaskClick"
+                ></news-modal-delete>
             </div>
         </div>
     </transition>
@@ -19,10 +26,11 @@
 <script>
 
 import NewsModalView from './Modals/NewsModalView'
+import NewsModalDelete from './Modals/NewsModalDelete'
 
 export default {
     name: 'NewsModalSet',
-    components: { NewsModalView },
+    components: { NewsModalView, NewsModalDelete },
     props: {
         isModalVisible: {
             type: Boolean,
@@ -47,6 +55,9 @@ export default {
         isViewMode: function () {
             return 'view' === this.mode
         },
+        isDeleteMode: function () {
+            return 'delete' === this.mode
+        },
     },
     watch: {
         isModalVisible: function () {
@@ -58,7 +69,9 @@ export default {
     methods: {
         setViewMode() {
             this.modalMode = 'view'
-            this.$emit('update:mode', 'view')
+        },
+        setDeleteMode() {
+            this.modalMode = 'delete'
         },
     },
 }
