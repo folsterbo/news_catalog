@@ -1,23 +1,15 @@
 <template>
-    <transition
-        name="modal"
-        v-if="isModalVisible"
-    >
+    <transition name="modal" v-if="isModalVisible">
         <div class="modal-mask" @mousedown="modalMaskClick++">
             <div class="modal-wrapper" @mousedown.stop="">
-                <news-modal-view class="news-modal-view"
-                    @modal-close-btn-clicked="$emit('modal-close-btn-clicked')"
-                    v-if="isViewMode"
-                    :id="id"
-                    :modalMaskClick="modalMaskClick"
-                ></news-modal-view>
-                <news-modal-delete class="news-modal-delete"
-                    @modal-close-btn-clicked="$emit('modal-close-btn-clicked')"
-                    @modal-delete-btn-clicked="modalDeleteRecordSuccessHandler"
-                    v-if="isDeleteMode"
-                    :id="id"
-                    :modalMaskClick="modalMaskClick"
-                ></news-modal-delete>
+                <news-modal-view class="news-modal-view" @modal-close-btn-clicked="$emit('modal-close-btn-clicked')"
+                    v-if="isViewMode" :id="id" :modalMaskClick="modalMaskClick"></news-modal-view>
+                <news-modal-delete class="news-modal-delete" @modal-close-btn-clicked="$emit('modal-close-btn-clicked')"
+                    @modal-delete-btn-clicked="modalUpdateRecordSuccessHandler" v-if="isDeleteMode" :id="id"
+                    :modalMaskClick="modalMaskClick"></news-modal-delete>
+                <news-modal-edit class="news-modal-edit" @modal-close-btn-clicked="$emit('modal-close-btn-clicked')"
+                    @modal-edit-btn-clicked="modalUpdateRecordSuccessHandler" v-if="isEditMode" :id="id" :arr="arr"
+                    :modalMaskClick="modalMaskClick"></news-modal-edit>
             </div>
         </div>
     </transition>
@@ -27,10 +19,11 @@
 
 import NewsModalView from './Modals/NewsModalView'
 import NewsModalDelete from './Modals/NewsModalDelete'
+import NewsModalEdit from './Modals/NewsModalEdit'
 
 export default {
     name: 'NewsModalSet',
-    components: { NewsModalView, NewsModalDelete },
+    components: { NewsModalView, NewsModalDelete, NewsModalEdit },
     props: {
         isModalVisible: {
             type: Boolean,
@@ -44,6 +37,9 @@ export default {
             type: Number,
             required: true,
         },
+        arr: {
+            type: Array,
+        }
     },
     data: function () {
         return {
@@ -57,6 +53,9 @@ export default {
         },
         isDeleteMode: function () {
             return 'delete' === this.mode
+        },
+        isEditMode: function () {
+            return 'edit' === this.mode
         },
     },
     watch: {
@@ -73,7 +72,10 @@ export default {
         setDeleteMode() {
             this.modalMode = 'delete'
         },
-        modalDeleteRecordSuccessHandler() {
+        setEditMode() {
+            this.modalMode = 'edit'
+        },
+        modalUpdateRecordSuccessHandler() {
             this.$emit('modal-close-btn-clicked');
             this.$emit('data-changes');
         },
@@ -83,4 +85,5 @@ export default {
 </script>
 
 <style lang="scss">
+
 </style>

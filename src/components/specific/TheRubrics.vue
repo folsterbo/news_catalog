@@ -1,62 +1,43 @@
 <template>
-    <v-card>
-        <v-toolbar
-            flat
-        >
-            <v-text-field
-                hide-details
-                prepend-icon="mdi-magnify"
-                single-line
-                v-model="searchStr"
-            >
-            </v-text-field>
+  <v-card>
+    <v-toolbar flat>
+      <v-text-field hide-details prepend-icon="mdi-magnify" single-line v-model="searchStr">
+      </v-text-field>
+    </v-toolbar>
+
+    <v-row class="pa-4" justify="space-between">
+      <v-col cols="5">
+        <v-treeview hoverable rounded activatable :items="items" :search="searchStr" :value="selectedNodes">
+        </v-treeview>
+      </v-col>
+      <v-col cols="2">
+        <v-toolbar flat>
+          <v-btn icon>
+            <v-icon>mdi-plus</v-icon>
+          </v-btn>
+
+          <v-btn icon>
+            <v-icon>mdi-pencil</v-icon>
+          </v-btn>
+
+          <v-btn icon>
+            <v-icon>mdi-trash-can-outline</v-icon>
+          </v-btn>
         </v-toolbar>
-
-        <v-row
-            class="pa-4"
-            justify="space-between"
-        >
-            <v-col cols="5">
-                <v-treeview
-                    hoverable
-                    rounded
-                    activatable
-                    :items="items"
-                    :search="searchStr"
-                    :value="selectedNodes"
-                >
-                </v-treeview>
-            </v-col>
-            <v-col cols="2">
-                <v-toolbar
-                    flat
-                >
-                    <v-btn icon>
-                        <v-icon>mdi-plus</v-icon>
-                    </v-btn>
-
-                    <v-btn icon>
-                        <v-icon>mdi-pencil</v-icon>
-                    </v-btn>
-
-                    <v-btn icon>
-                        <v-icon>mdi-trash-can-outline</v-icon>
-                    </v-btn>
-                </v-toolbar>
-            </v-col>
-        </v-row>
-    </v-card>
+      </v-col>
+    </v-row>
+  </v-card>
 </template>
 
 <script>
 export default {
-    name: 'TheRubrics',
-    components: {  },
-    data: function () {
-        return {
-            searchStr: '',
-            selectedNodes: [],
-            items: [
+  name: 'TheRubrics',
+  components: {},
+  data: function () {
+    return {
+      searchStr: '',
+      selectedNodes: [],
+      items: [
         {
           id: 1,
           name: 'Applications :',
@@ -128,31 +109,31 @@ export default {
           ],
         },
       ],
+    }
+  },
+  computed: {
+    requestRoute: function () {
+      return 'http://localhost/api/news/rubrics';
+    },
+  },
+  methods: {
+    updateData() {
+      this.axios.get(
+        this.requestRoute,
+      ).then(response => {
+        if (response.data?.success) {
+          this.items = response?.data?.items;
+        } else {
+          console.log(response?.data);
         }
+      }).catch(error => {
+        console.log(error);
+      });
     },
-    computed: {
-        requestRoute: function () {
-            return 'http://localhost/api/news/rubrics';
-        },
-    },
-    methods: {
-        updateData() {
-            this.axios.get(
-                this.requestRoute,
-            ).then(response => {
-                if (response.data?.success) {
-                    this.items = response?.data?.items;
-                } else {
-                    console.log(response?.data);
-                }
-            }).catch(error => {
-                console.log(error);
-            });
-        },
-    },
-    created() {
-        // this.updateData();
-    },
+  },
+  created() {
+    // this.updateData();
+  },
 }
 
 </script>

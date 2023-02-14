@@ -1,12 +1,7 @@
 <template>
-    <div class="modal-container"
-         @keydown.esc.stop="$emit('modal-close-btn-clicked')"
-    >
+    <div class="modal-container" @keydown.esc.stop="$emit('modal-close-btn-clicked')">
         <div class="modal-header">
-            <v-btn
-                icon
-                @click="$emit('modal-close-btn-clicked')"
-            >
+            <v-btn icon @click="$emit('modal-close-btn-clicked')">
                 <v-icon>mdi-close</v-icon>
             </v-btn>
         </div>
@@ -16,14 +11,8 @@
         </div>
 
         <div class="modal-footer">
-            <v-btn
-                text
-                @click="$emit('modal-close-btn-clicked')"
-            >Нет</v-btn>
-            <v-btn
-                text
-                @click="deleteRecord"
-            >Да</v-btn>
+            <v-btn text @click="$emit('modal-close-btn-clicked')">Нет</v-btn>
+            <v-btn text @click="deleteRecord">Да</v-btn>
         </div>
     </div>
 </template>
@@ -32,7 +21,7 @@
 
 export default {
     name: 'NewsModalDelete',
-    components: {  },
+    components: {},
     props: {
         id: {
             type: Number,
@@ -59,12 +48,6 @@ export default {
         requestRoute: function () {
             return 'http://localhost/api/news/' + this.id;
         },
-        newsHeader: function () {
-            return this?.articleData?.news_header || 'нет данных';
-        },
-        newsBody: function () {
-            return this?.articleData?.news_body || 'нет данных';
-        },
     },
     methods: {
         deleteRecord() {
@@ -88,6 +71,7 @@ export default {
 <style lang="scss">
 .modal-container.news-modal-delete {
     width: 300px;
+
     .modal-body {
         height: unset;
     }

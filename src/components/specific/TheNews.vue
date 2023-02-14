@@ -1,68 +1,40 @@
 <template>
     <v-card>
-        <v-toolbar
-            flat
-        >
-            <v-text-field
-                hide-details
-                prepend-icon="mdi-magnify"
-                single-line
-                v-model="searchStr"
-            >
+        <v-toolbar flat>
+            <v-text-field hide-details prepend-icon="mdi-magnify" single-line v-model="searchStr">
             </v-text-field>
         </v-toolbar>
 
-        <v-row
-            class="pa-4"
-            justify="space-between"
-        >
+        <v-row class="pa-4" justify="space-between">
             <v-col cols="7">
-                <v-card
-                    class="mx-auto"
-                    v-for="(item, itemIndex) in this.newsData" :key="itemIndex"
-                >
+                <v-card class="mx-auto" v-for="(item, itemIndex) in this.newsData" :key="itemIndex">
                     <v-toolbar flat>
-                        <v-toolbar-title>{{item.news_header}}</v-toolbar-title>
+                        <v-toolbar-title>{{ item.news_header }}</v-toolbar-title>
 
                         <v-spacer></v-spacer>
 
-                        <v-btn icon>
+                        <v-btn icon @click="setEditAlrticle(item.id)">
                             <v-icon>mdi-pencil</v-icon>
                         </v-btn>
 
-                        <v-btn
-                            icon
-                            @click="setDeleteAlrticle(item.id)"
-                        >
+                        <v-btn icon @click="setDeleteAlrticle(item.id)">
                             <v-icon>mdi-trash-can-outline</v-icon>
                         </v-btn>
                     </v-toolbar>
                     <v-card-text>
-                        <div>{{item.news_announcement}}</div>
+                        <div>{{ item.news_announcement }}</div>
                     </v-card-text>
                     <v-card-actions>
                         <div>
-                            <v-chip-group
-                                active-class="primary--text"
-                                column
-                            >
-                                <v-chip
-                                    v-for="tag in item.rubrics"
-                                    :key="tag.id"
-                                    color="#ebe6f2"
-                                >
+                            <v-chip-group active-class="primary--text" column>
+                                <v-chip v-for="tag in item.rubrics" :key="tag.id" color="#ebe6f2">
                                     {{ tag.rubric_name }}
                                 </v-chip>
                             </v-chip-group>
                         </div>
 
                         <div>
-                            <v-btn
-                                color="green"
-                                small
-                                text
-                                @click="setViewAlrticle(item.id)"
-                            >
+                            <v-btn color="green" small text @click="setViewAlrticle(item.id)">
                                 Просмотр
                             </v-btn>
                         </div>
@@ -70,83 +42,44 @@
                 </v-card>
             </v-col>
             <v-col cols="4">
-                <v-toolbar
-                    flat
-                >
+                <v-toolbar flat>
                     <v-spacer></v-spacer>
-                    <v-btn
-                        text
-                        @click="openForm">
+                    <v-btn text @click="openForm">
                         Добавить новость
                     </v-btn>
                 </v-toolbar>
                 <div v-if="this.isFormOpen" class="add-news-form">
                     <v-form>
                         <v-container>
-                            <v-text-field
-                                v-model="newsHeader"
-                                label="Заголовок"
-                                required
-                            ></v-text-field>
+                            <v-text-field v-model="newsHeader" label="Заголовок" required></v-text-field>
 
-                            <v-text-field
-                                v-model="newsAnnouncement"
-                                label="Анонс"
-                                required
-                            ></v-text-field>
+                            <v-text-field v-model="newsAnnouncement" label="Анонс" required></v-text-field>
 
-                            <v-text-field
-                                v-model="newsBody"
-                                label="Текст"
-                                required
-                            ></v-text-field>
+                            <v-text-field v-model="newsBody" label="Текст" required></v-text-field>
 
-                            <v-select
-                                multiple
-                                v-model="rubricsId"
-                                label="Рубрика"
-                                :items="arr"
-                            >
+                            <v-select multiple v-model="rubricsId" label="Рубрика" :items="arr">
                             </v-select>
                         </v-container>
                     </v-form>
 
-                    <v-toolbar
-                        flat
-                    >
+                    <v-toolbar flat>
                         <v-spacer></v-spacer>
-                        <v-btn
-                            text
-                            small
-                            @click="cancelForm">
+                        <v-btn text small @click="cancelForm">
                             Отмена
                         </v-btn>
-                        <v-btn
-                            text
-                            small
-                            @click="clearForm">
+                        <v-btn text small @click="clearForm">
                             Очистить
                         </v-btn>
-                        <v-btn
-                            text
-                            small
-                            @click="createRecord">
+                        <v-btn text small @click="createRecord">
                             Сохранить
                         </v-btn>
                     </v-toolbar>
 
                     <div v-if="isUpdateError">
-                        <v-alert
-                            colored-border
-                            type="error"
-                            elevation="2"
-                            >
+                        <v-alert colored-border type="error" elevation="2">
                             <v-list-item-content>
-                                <v-list-item-title>{{errorMsg}}</v-list-item-title>
-                                <li
-                                    v-for="error in errors"
-                                    :key="error.id"
-                                >{{ error }}</li>
+                                <v-list-item-title>{{ errorMsg }}</v-list-item-title>
+                                <li v-for="error in errors" :key="error.id">{{ error }}</li>
                             </v-list-item-content>
                         </v-alert>
                     </div>
@@ -154,13 +87,9 @@
                 </div>
             </v-col>
         </v-row>
-        <news-modal-set
-            @modal-close-btn-clicked="closeModal"
-            @data-changes="updateData"
-            :is-modal-visible="isModalVisible"
-            :mode.sync="modalMode"
-            :id="lastClickedArticleId"
-        ></news-modal-set>
+        <news-modal-set @modal-close-btn-clicked="closeModal" @data-changes="updateData"
+            :is-modal-visible="isModalVisible" :mode.sync="modalMode" :id="lastClickedArticleId"
+            :arr="arr"></news-modal-set>
     </v-card>
 </template>
 
@@ -250,9 +179,8 @@ export default {
             ).then(response => {
                 if (response.data?.success) {
                     const items = response?.data?.items;
-                    //response?.data?.items.map(item => item.rubric_name[item.id]);
                     for (let i = 0; i < items.length; i++) {
-                        this.arr[i] = {text: items[i].rubric_name, value: items[i].id,}
+                        this.arr[i] = { text: items[i].rubric_name, value: items[i].id, }
                     }
                 } else {
                     console.log(response?.data);
@@ -262,7 +190,7 @@ export default {
             });
         },
         openForm() {
-            this.isFormOpen=true;
+            this.isFormOpen = true;
         },
         clearForm() {
             this.isUpdateError = false;
@@ -280,8 +208,8 @@ export default {
             this.rubricsId = [];
         },
         createRecord() {
-            const url       = this.requestRoute;
-            const data      = this.articleData;
+            const url = this.requestRoute;
+            const data = this.articleData;
 
             this.axios.post(url,
                 { data },
@@ -291,8 +219,8 @@ export default {
                     this.updateData();
                 } else {
                     this.isUpdateError = true;
-                    this.errorMsg      = response?.data.message;
-                    this.errors        = response?.data.errors;
+                    this.errorMsg = response?.data.message;
+                    this.errors = response?.data.errors;
                     console.log(response?.data);
                 }
             }).catch(error => {
@@ -301,12 +229,17 @@ export default {
         },
         setViewAlrticle(id) {
             this.lastClickedArticleId = id;
-            this.modalMode      = 'view';
+            this.modalMode = 'view';
             this.isModalVisible = true;
         },
         setDeleteAlrticle(id) {
             this.lastClickedArticleId = id;
-            this.modalMode      = 'delete';
+            this.modalMode = 'delete';
+            this.isModalVisible = true;
+        },
+        setEditAlrticle(id) {
+            this.lastClickedArticleId = id;
+            this.modalMode = 'edit';
             this.isModalVisible = true;
         },
         closeModal() {
