@@ -7,14 +7,25 @@
   .container {
     max-width: 1200px;
   }
-
   .responsiveMenu {
     a {
       color: $black;
     }
   }
 }
-
+.v-card {
+  margin-bottom: 12px;
+  padding: 2px;
+  min-width: fit-content;
+  .text--primary {
+    max-height: 60px;
+    overflow-y: hidden;
+    text-overflow: ellipsis;
+  }
+  .v-card__actions {
+    justify-content: space-between;
+  }
+}
 // block
 .block {
   padding: 60px 0;

@@ -7,6 +7,8 @@
       <the-header></the-header>
     </v-app-bar>
 
+    <v-breadcrumbs></v-breadcrumbs>
+
     <v-main>
       <the-main-content></the-main-content>
     </v-main>

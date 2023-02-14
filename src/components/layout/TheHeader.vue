@@ -1,6 +1,8 @@
 <template>
     <v-toolbar flat light>
-      <v-toolbar-title>Новостной каталог</v-toolbar-title>
+      <v-toolbar-title>
+        <router-link to="/home">Новостной каталог</router-link>
+      </v-toolbar-title>
 
       <v-spacer></v-spacer>
 
@@ -22,14 +24,14 @@
         return {
             menuItems: [
                 {
+                    name: 'news',
+                    title: 'Новости',
+                    url: '/news',
+                },
+                {
                     name: 'rubrics',
                     title: 'Рубрики',
                     url: '/rubrics',
-                },
-                {
-                    name: 'news',
-                    title: 'Статьи',
-                    url: '/news',
                 },
             ],
         }
