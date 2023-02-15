@@ -104,7 +104,7 @@ export default {
                 return this.articleData.rubrics ?? '';
             },
             set: function (newVal) {
-                this.articleData.rubrics = newVal;
+                this.articleData.rubrics_id = newVal;
             },
         },
     },
