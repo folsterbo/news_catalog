@@ -1,7 +1,10 @@
 <template>
     <v-card>
         <v-toolbar flat>
-            <v-text-field hide-details prepend-icon="mdi-magnify" single-line v-model="searchStr">
+            <v-btn icon @click="searchData()">
+                <v-icon>mdi-magnify</v-icon>
+            </v-btn>
+            <v-text-field hide-details @keydown.enter="searchData()" single-line v-model="searchStringData.search">
             </v-text-field>
         </v-toolbar>
 
@@ -105,6 +108,9 @@ export default {
             arr: [],
             newsData: [],
             searchStr: '',
+            searchStringData: {
+                search: '',
+            },
             isFormOpen: false,
             articleData: {
                 news_header: '',
@@ -126,6 +132,9 @@ export default {
         },
         requestRubricsRoute: function () {
             return 'http://localhost/api/news/rubrics';
+        },
+        searchRoute: function () {
+            return 'http://localhost/api/news/search';
         },
         newsHeader: {
             get: function () {
@@ -163,7 +172,7 @@ export default {
     methods: {
         updateData() {
             this.axios.get(
-                this.requestRoute,
+                this.requestRoute, 
             ).then(response => {
                 if (response.data?.success) {
                     this.newsData = response?.data?.items;
@@ -182,6 +191,22 @@ export default {
                     for (let i = 0; i < items.length; i++) {
                         this.arr[i] = { text: items[i].rubric_name, value: items[i].id, }
                     }
+                } else {
+                    console.log(response?.data);
+                }
+            }).catch(error => {
+                console.log(error);
+            });
+        },
+        searchData() {
+            const url  = this.searchRoute;
+            const data = this.searchStringData;
+
+            this.axios.post(url,
+                { data },
+            ).then(response => {
+                if (response.data?.success) {
+                    this.newsData = response?.data?.items;
                 } else {
                     console.log(response?.data);
                 }
