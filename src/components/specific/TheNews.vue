@@ -209,6 +209,7 @@ export default {
                     this.newsData = response?.data?.items;
                 } else {
                     console.log(response?.data);
+                    this.updateData();
                 }
             }).catch(error => {
                 console.log(error);
