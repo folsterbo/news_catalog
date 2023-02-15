@@ -16,7 +16,7 @@
 
                         <v-spacer></v-spacer>
 
-                        <v-btn icon @click="setEditAlrticle(item.id)">
+                        <v-btn icon @click="setEditAlrticle(item.id)"> 
                             <v-icon>mdi-pencil</v-icon>
                         </v-btn>
 
@@ -45,12 +45,15 @@
                 </v-card>
             </v-col>
             <v-col cols="4">
-                <v-toolbar flat>
-                    <v-spacer></v-spacer>
-                    <v-btn text @click="openForm">
-                        Добавить новость
+                <div class="btn-group">
+                    <v-btn small text @click="openFormSync" :class="{ 'btn-active': isFormOpen && isSync }">
+                        Добавить новость синхронно
                     </v-btn>
-                </v-toolbar>
+                    <v-btn small text @click="openFormAsync"
+                        :class="{ 'btn-active': isFormOpen && !isSync }">
+                        Добавить новость асинхронно
+                    </v-btn>
+                </div>
                 <div v-if="this.isFormOpen" class="add-news-form">
                     <v-form>
                         <v-container>
@@ -65,7 +68,7 @@
                         </v-container>
                     </v-form>
 
-                    <v-toolbar flat>
+                    <v-toolbar flat v-if="this.isSync">
                         <v-spacer></v-spacer>
                         <v-btn text small @click="cancelForm">
                             Отмена
@@ -78,12 +81,34 @@
                         </v-btn>
                     </v-toolbar>
 
+                    <v-toolbar flat v-if="!this.isSync">
+                        <v-spacer></v-spacer>
+                        <v-btn text small @click="cancelForm">
+                            Отмена
+                        </v-btn>
+                        <v-btn text small @click="clearForm">
+                            Очистить
+                        </v-btn>
+                        <v-btn text small @click="createRecordAsync">
+                            Сохранить
+                        </v-btn>
+                    </v-toolbar>
+
                     <div v-if="isUpdateError">
                         <v-alert colored-border type="error" elevation="2">
                             <v-list-item-content>
                                 <v-list-item-title>{{ errorMsg }}</v-list-item-title>
                                 <li v-for="error in errors" :key="error.id">{{ error }}</li>
                             </v-list-item-content>
+                        </v-alert>
+                    </div>
+
+                    <div v-if="isAsyncSuccess">
+                        <v-alert colored-border type="success" elevation="2">
+                                <p>Запрос выполнен успешно</p>
+                                <v-btn text small @click="updateData()">
+                                    Обновить страницу
+                                </v-btn>
                         </v-alert>
                     </div>
 
@@ -124,6 +149,9 @@ export default {
             modalMode: 'view',
             errorMsg: '',
             errors: {},
+            isSync: false,
+            postId: null,
+            isAsyncSuccess: false,
         }
     },
     computed: {
@@ -172,7 +200,7 @@ export default {
     methods: {
         updateData() {
             this.axios.get(
-                this.requestRoute, 
+                this.requestRoute,
             ).then(response => {
                 if (response.data?.success) {
                     this.newsData = response?.data?.items;
@@ -199,7 +227,7 @@ export default {
             });
         },
         searchData() {
-            const url  = this.searchRoute;
+            const url = this.searchRoute;
             const data = this.searchStringData;
 
             this.axios.post(url,
@@ -215,11 +243,21 @@ export default {
                 console.log(error);
             });
         },
-        openForm() {
+        openFormSync() {
             this.isFormOpen = true;
+            this.isSync = true;
+            this.isUpdateError = false;
+            this.isAsyncSuccess = false;
+        },
+        openFormAsync() {
+            this.isFormOpen = true;
+            this.isSync = false;
+            this.isUpdateError = false;
+            this.isAsyncSuccess = false;
         },
         clearForm() {
             this.isUpdateError = false;
+            this.isAsyncSuccess = false;
             this.newsHeader = '';
             this.newsAnnouncement = '';
             this.newsBody = '';
@@ -228,12 +266,15 @@ export default {
         cancelForm() {
             this.isFormOpen = false;
             this.isUpdateError = false;
+            this.isAsyncSuccess = false;
             this.newsHeader = '';
             this.newsAnnouncement = '';
             this.newsBody = '';
             this.rubricsId = [];
         },
         createRecord() {
+            this.isUpdateError = false;
+            this.isAsyncSuccess = false;
             const url = this.requestRoute;
             const data = this.articleData;
 
@@ -252,6 +293,21 @@ export default {
             }).catch(error => {
                 console.log(error);
             });
+        },
+        async createRecordAsync() {
+            this.isUpdateError = false;
+            this.isAsyncSuccess = false;
+            const url = this.requestRoute;
+            const data = this.articleData;
+            const response = await this.axios.post(url, { data });
+            if (response?.data?.success) {
+                this.isAsyncSuccess = true;
+            } else {
+                this.isUpdateError = true;
+                this.errorMsg = response?.data.message;
+                this.errors = response?.data.errors;
+            }
+            console.log(response?.data);
         },
         setViewAlrticle(id) {
             this.lastClickedArticleId = id;
@@ -280,6 +336,15 @@ export default {
 </script>
 
 <style  lang="scss">
+.btn-group {
+    display: flex;
+    flex-direction: column;
+
+    .btn-active {
+        background-color: #ebe6f2;
+    }
+}
+
 .add-news-form {
     width: 400px;
 }
