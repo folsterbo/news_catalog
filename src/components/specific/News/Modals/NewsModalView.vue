@@ -62,7 +62,7 @@ export default {
     },
     computed: {
         requestRoute: function () {
-            return 'http://localhost/api/news/' + this.id;
+            return process.env.VUE_APP_HOST + '/api/news/' + this.id;
         },
         newsHeader: function () {
             return this?.articleData?.news_header || 'нет данных';

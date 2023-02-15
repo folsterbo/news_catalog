@@ -46,7 +46,7 @@ export default {
     },
     computed: {
         requestRoute: function () {
-            return 'http://localhost/api/news/' + this.id;
+            return process.env.VUE_APP_HOST + '/api/news/' + this.id;
         },
     },
     methods: {

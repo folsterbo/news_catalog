@@ -128,13 +128,13 @@ export default {
     },
     computed: {
         requestRoute: function () {
-            return 'http://localhost/api/news/';
+            return process.env.VUE_APP_HOST + '/api/news/';
         },
         requestRubricsRoute: function () {
-            return 'http://localhost/api/news/rubrics';
+            return process.env.VUE_APP_HOST + '/api/news/rubrics';
         },
         searchRoute: function () {
-            return 'http://localhost/api/news/search';
+            return process.env.VUE_APP_HOST + '/api/news/search';
         },
         newsHeader: {
             get: function () {
