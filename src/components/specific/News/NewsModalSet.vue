@@ -69,12 +69,6 @@ export default {
         setViewMode() {
             this.modalMode = 'view'
         },
-        setDeleteMode() {
-            this.modalMode = 'delete'
-        },
-        setEditMode() {
-            this.modalMode = 'edit'
-        },
         modalUpdateRecordSuccessHandler() {
             this.$emit('modal-close-btn-clicked');
             this.$emit('data-changes');

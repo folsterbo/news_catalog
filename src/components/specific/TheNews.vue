@@ -16,7 +16,7 @@
 
                         <v-spacer></v-spacer>
 
-                        <v-btn icon @click="setEditAlrticle(item.id)"> 
+                        <v-btn icon @click="setEditAlrticle(item.id)">
                             <v-icon>mdi-pencil</v-icon>
                         </v-btn>
 
@@ -49,8 +49,7 @@
                     <v-btn small text @click="openFormSync" :class="{ 'btn-active': isFormOpen && isSync }">
                         Добавить новость синхронно
                     </v-btn>
-                    <v-btn small text @click="openFormAsync"
-                        :class="{ 'btn-active': isFormOpen && !isSync }">
+                    <v-btn small text @click="openFormAsync" :class="{ 'btn-active': isFormOpen && !isSync }">
                         Добавить новость асинхронно
                     </v-btn>
                 </div>
@@ -105,10 +104,10 @@
 
                     <div v-if="isAsyncSuccess">
                         <v-alert colored-border type="success" elevation="2">
-                                <p>Запрос выполнен успешно</p>
-                                <v-btn text small @click="updateData()">
-                                    Обновить страницу
-                                </v-btn>
+                            <p>Запрос выполнен успешно</p>
+                            <v-btn text small @click="updateData()">
+                                Обновить страницу
+                            </v-btn>
                         </v-alert>
                     </div>
 

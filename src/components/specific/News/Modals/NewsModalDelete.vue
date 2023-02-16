@@ -40,8 +40,6 @@ export default {
     },
     data: function () {
         return {
-            articleData: {},
-            rubricsData: [],
         }
     },
     computed: {
