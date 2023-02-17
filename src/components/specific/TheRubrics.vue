@@ -4,8 +4,8 @@
       <v-row class="pa-4" justify="space-between">
         <v-col cols="5">
           <div>
-            <tree-data-group @item-clicked="transmit" :items-object="itemsObject" :tree-data="treeData"
-              :key="updateKey" @item-toggle="updateChildrenData()"></tree-data-group>
+            <tree-data-group @item-clicked="transmit" :tree-data="treeData"
+              :key="updateKey"></tree-data-group>
           </div>
           <v-btn text :class="{ 'active': isActive }" @click="openFormAddParentRubric" color="info">
             Добавить новую рубрику
@@ -134,12 +134,6 @@ export default {
       searchStr: '',
       rubricsArr: [],
       currentObject: {},
-      itemsObject: {
-        itemHaveChild: 'have_child',
-        parentKey: 'rubric_name',
-        recursionKey: 'id',
-        dropdownContent: [],
-      },
       isActive: false,
       isModalVisible: false,
       modalMode: 'create',
@@ -166,9 +160,6 @@ export default {
   computed: {
     requestRoute: function () {
       return process.env.VUE_APP_HOST + '/api/news/rubrics';
-    },
-    requestChildrenRoute: function () {
-      return process.env.VUE_APP_HOST + '/api/news/rubrics/' + this.currentObject.id + '/children';
     },
     requestParentRoute: function () {
       return process.env.VUE_APP_HOST + '/api/news/rubrics/parents';
@@ -204,23 +195,10 @@ export default {
   methods: {
     updateData() {
       this.axios.get(
-        this.requestRoute,
+        this.requestParentRoute,
       ).then(response => {
         if (response.data?.success) { 
           this.treeData = response?.data?.items;
-        } else {
-          console.log(response?.data);
-        }
-      }).catch(error => {
-        console.log(error);
-      });
-    },
-    updateChildrenData() {
-      this.axios.get(
-        this.requestChildrenRoute,
-      ).then(response => {
-        if (response.data?.success) {
-          this.itemsObject.dropdownContent = response?.data?.items;
         } else {
           console.log(response?.data);
         }

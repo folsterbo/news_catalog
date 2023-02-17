@@ -6,7 +6,6 @@
             class="tree-data-item"
             :item="item"
             :last-clicked-item-id="lastClickedItemId"
-            :items-object="itemsObject"
             @change-event="transmit"
             @item-clicked="itemClickHandler"
             @item-toggle="$emit('item-toggle')"
@@ -25,10 +24,6 @@ export default {
     props: {
         treeData: {
             type: Array,
-            required: true,
-        },
-        itemsObject: {
-            type: Object,
             required: true,
         },
     },
