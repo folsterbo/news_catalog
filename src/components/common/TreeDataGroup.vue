@@ -9,6 +9,7 @@
             :items-object="itemsObject"
             @change-event="transmit"
             @item-clicked="itemClickHandler"
+            @item-toggle="$emit('item-toggle')"
             @dropdown-btn-clicked="$emit('dropdown-btn-clicked', $event)"
         ></tree-data-item>
     </div>

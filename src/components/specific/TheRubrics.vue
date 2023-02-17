@@ -1,16 +1,11 @@
 <template>
   <div>
     <v-card>
-      <v-toolbar flat>
-        <v-text-field hide-details prepend-icon="mdi-magnify" single-line v-model="searchStr">
-        </v-text-field>
-      </v-toolbar>
-
       <v-row class="pa-4" justify="space-between">
         <v-col cols="5">
           <div>
-            <tree-data-group @item-clicked="transmit" :items-object="itemsObject" :tree-data="itemsObject.dropdownContent"
-              :key="updateKey"></tree-data-group>
+            <tree-data-group @item-clicked="transmit" :items-object="itemsObject" :tree-data="treeData"
+              :key="updateKey" @item-toggle="updateChildrenData()"></tree-data-group>
           </div>
           <v-btn text :class="{ 'active': isActive }" @click="openFormAddParentRubric" color="info">
             Добавить новую рубрику
@@ -25,13 +20,11 @@
               <v-icon>mdi-pencil</v-icon>
             </v-btn>
 
-            <v-btn icon :class="{ 'active': isActive }" @click="openFormDeleteChildRubric"
-              :disabled="!this.isActive">
+            <v-btn icon :class="{ 'active': isActive }" @click="openFormDeleteChildRubric" :disabled="!this.isActive">
               <v-icon>mdi-trash-can-outline</v-icon>
             </v-btn>
 
-            <v-btn icon :class="{ 'active': isActive }" @click="openFormAddChildRubric"
-              :disabled="!this.isActive">
+            <v-btn icon :class="{ 'active': isActive }" @click="openFormAddChildRubric" :disabled="!this.isActive">
               <v-icon>mdi-plus</v-icon>
             </v-btn>
           </v-toolbar>
@@ -95,8 +88,7 @@
           <div v-if="this.isEditChildFormOpen" class="rubrics-form">
             <v-form>
               <v-container>
-                <v-text-field v-model="rubricEditName" label="Рубрика"
-                  required></v-text-field>
+                <v-text-field v-model="rubricEditName" label="Рубрика" required></v-text-field>
               </v-container>
             </v-form>
 
@@ -126,7 +118,7 @@
         </v-col>
       </v-row>
     </v-card>
-</div>
+  </div>
 </template>
 
 <script>
@@ -143,8 +135,9 @@ export default {
       rubricsArr: [],
       currentObject: {},
       itemsObject: {
+        itemHaveChild: 'have_child',
         parentKey: 'rubric_name',
-        recursionKey: 'have_child',
+        recursionKey: 'id',
         dropdownContent: [],
       },
       isActive: false,
@@ -167,17 +160,18 @@ export default {
       isAddChildFormOpen: false,
       isDeleteChildFormOpen: false,
       isEditChildFormOpen: false,
+      treeData: [],
     }
   },
   computed: {
     requestRoute: function () {
       return process.env.VUE_APP_HOST + '/api/news/rubrics';
     },
-    requestParentRoute: function () {
-      return process.env.VUE_APP_HOST + '/api/news/rubrics/parents';
-    },
     requestChildrenRoute: function () {
       return process.env.VUE_APP_HOST + '/api/news/rubrics/' + this.currentObject.id + '/children';
+    },
+    requestParentRoute: function () {
+      return process.env.VUE_APP_HOST + '/api/news/rubrics/parents';
     },
     requestUpdateRoute: function () {
       return process.env.VUE_APP_HOST + '/api/news/rubrics/' + this.currentObject.id;
@@ -210,10 +204,10 @@ export default {
   methods: {
     updateData() {
       this.axios.get(
-        this.requestParentRoute,
+        this.requestRoute,
       ).then(response => {
-        if (response.data?.success) {
-          this.itemsObject.dropdownContent = response?.data?.items;
+        if (response.data?.success) { 
+          this.treeData = response?.data?.items;
         } else {
           console.log(response?.data);
         }
@@ -241,9 +235,6 @@ export default {
       this.$emit('item-clicked', data);
       this.isActive = true;
       this.isAddFormOpen = false;
-      if (data.have_child) {
-        this.updateChildrenData();
-      }
     },
     openFormAddParentRubric() {
       this.isAddFormOpen = true;

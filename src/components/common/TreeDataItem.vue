@@ -22,12 +22,10 @@
                 @click="toggle"
             >
             </div>
-
-
         </div>
         <ul class="tree-data-main" v-show="isOpen" v-if="haveChild">
             <tree-data-item
-                v-for="(item, index) in item[this.itemsObject.recursionKey]"
+                v-for="(item, index) in this.itemsObject.dropdownContent"
                 :item="item"
                 :key="index"
                 :last-clicked-item-id="lastClickedItemId"
@@ -70,23 +68,24 @@ export default {
     },
     computed: {
         haveChild: function () {
-            return this.item[this.itemsObject.recursionKey];
+            return this.item[this.itemsObject.itemHaveChild];
         },
     },
     methods: {
         transmit(event, item) {
-            this.$emit('change-event', event, item)
+            this.$emit('change-event', event, item);
         },
         itemClickEvent(item) {
-            item.path = '/' + this.item.id
+            item.path = '/' + this.item.id;
             this.$emit('item-clicked', item);
         },
         itemClickHandler(item) {
-            item.path = '/' + this.item.id + item.path
-            this.$emit('item-clicked', item)
+            item.path = '/' + item.path + '/children/' + this.item.id;
+            this.$emit('item-clicked', item);
         },
         toggle() {
             this.isOpen = !this.isOpen
+            this.$emit('item-toggle');
         },
         isSelectedItem(item) {
             return item[this.idFieldName] === this.lastClickedItemId;
@@ -124,5 +123,13 @@ export default {
     align-items: center;
     justify-content: center;
 }
-
+.tree-data-main {
+    width: 200px;
+    height: 200px;
+    background-color: aqua;
+}
+.mdi-chevron-right:hover {
+    background-color: #ae9dc6;
+    border-radius: 12px;
+}
 </style>
