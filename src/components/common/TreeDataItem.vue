@@ -1,17 +1,18 @@
 <template>
-    <li :class="['tree-data-item', isSelectedItem(item) && 'selected']">
-        <div class="item-name" :class="{ bold: haveChild }" @click="itemClickEvent(item)">
+    <li class="tree-data-item">
+        <div class="item-name" :class="{ bold: haveChild, selected: isSelectedItem(item) }" @click="itemClickEvent(item)">
             <i class="mdi mdi-folder-outline" v-if="haveChild"></i>
             <i class="mdi mdi-circle-small" v-else></i>
             <div class="item-name">{{ item[this.itemsObject.parentKey] }}</div>
 
-            <div class="mdi mdi-chevron-right" v-if="haveChild" :class="{ 'item-open': isOpen }" @click="toggle(item)" @item-edited="updateChildrenData()">
+            <div class="mdi mdi-chevron-right" v-if="haveChild" :class="{ 'item-open': isOpen }" @click="toggle(item)"
+                @item-edited="updateChildrenData()">
             </div>
         </div>
         <ul class="tree-data-main" v-show="isOpen" v-if="haveChild">
-            <tree-data-item v-for="(item, index) in this.itemsObject.dropdownContent" :item="item" :key="index" :updateKey="updateKey"
-                :last-clicked-item-id="lastClickedItemId" :items-object="itemsObject" @item-clicked="itemClickHandler"
-                ></tree-data-item>
+            <tree-data-item v-for="(item, index) in this.itemsObject.dropdownContent" :item="item" :key="index"
+                :updateKey="updateKey" :last-clicked-item-id="lastClickedItemId" :items-object="itemsObject"
+                @item-clicked="itemClickHandler"></tree-data-item>
         </ul>
     </li>
 </template>
@@ -112,6 +113,11 @@ export default {
     font-weight: bold;
 }
 
+.item-name.selected {
+    background-color: #ebe6f2;
+    border-radius: 12px;
+}
+
 .item-name:hover {
     background-color: #f6f2fc;
     border-radius: 12px;
@@ -131,10 +137,6 @@ export default {
     display: flex;
     align-items: center;
     justify-content: center;
-}
-
-.tree-data-main {
-
 }
 
 .mdi-chevron-right:hover {
