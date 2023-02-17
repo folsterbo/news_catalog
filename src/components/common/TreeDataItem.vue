@@ -2,12 +2,12 @@
     <li :class="['tree-data-item', isSelectedItem(item) && 'selected']">
         <div
             class="item-name"
-            :class="{bold: hasChild}"
+            :class="{bold: haveChild}"
             @click="itemClickEvent(item)"
         >
             <i
                 class="mdi mdi-folder-outline"
-                v-if="hasChild"
+                v-if="haveChild"
             ></i>
             <i
                 class="mdi mdi-circle-small"
@@ -17,7 +17,7 @@
             
             <div
                 class="mdi mdi-chevron-right"
-                v-if="hasChild"
+                v-if="haveChild"
                 :class="{'item-open': isOpen}"
                 @click="toggle"
             >
@@ -25,7 +25,7 @@
 
 
         </div>
-        <ul class="tree-data-main" v-show="isOpen" v-if="hasChild">
+        <ul class="tree-data-main" v-show="isOpen" v-if="haveChild">
             <tree-data-item
                 v-for="(item, index) in item[this.itemsObject.recursionKey]"
                 :item="item"
@@ -69,7 +69,7 @@ export default {
         };
     },
     computed: {
-        hasChild: function () {
+        haveChild: function () {
             return this.item[this.itemsObject.recursionKey];
         },
     },

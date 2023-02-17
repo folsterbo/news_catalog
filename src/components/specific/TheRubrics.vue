@@ -19,19 +19,19 @@
         <v-col cols="2" class="rubric-form">
           <h5>Редактирование рубрики</h5>
           <v-toolbar flat>
-            <h5 v-if="this.currentObject.rubric_name">{{ this.currentObject.rubric_name }}</h5>
+            <h5 v-if="this.currentObject.rubric_name && isActive">{{ this.currentObject.rubric_name }}</h5>
             <v-spacer></v-spacer>
-            <v-btn icon :class="{ 'active': isActive }" :disabled="!this.currentObject.rubric_name">
+            <v-btn icon :class="{ 'active': isActive }" :disabled="!this.isActive" @click="openFormEditChildRubric">
               <v-icon>mdi-pencil</v-icon>
             </v-btn>
 
             <v-btn icon :class="{ 'active': isActive }" @click="openFormDeleteChildRubric"
-              :disabled="!this.currentObject.rubric_name">
+              :disabled="!this.isActive">
               <v-icon>mdi-trash-can-outline</v-icon>
             </v-btn>
 
             <v-btn icon :class="{ 'active': isActive }" @click="openFormAddChildRubric"
-              :disabled="!this.currentObject.rubric_name">
+              :disabled="!this.isActive">
               <v-icon>mdi-plus</v-icon>
             </v-btn>
           </v-toolbar>
@@ -39,6 +39,7 @@
           <div v-if="this.isAddFormOpen" class="rubrics-form">
             <v-form>
               <v-container>
+                <p>Добавление рубрики:</p>
                 <v-text-field v-model="rubricName" label="Рубрика" required></v-text-field>
               </v-container>
             </v-form>
@@ -91,6 +92,28 @@
             </v-toolbar>
           </div>
 
+          <div v-if="this.isEditChildFormOpen" class="rubrics-form">
+            <v-form>
+              <v-container>
+                <v-text-field v-model="rubricEditName" label="Рубрика"
+                  required></v-text-field>
+              </v-container>
+            </v-form>
+
+            <v-toolbar flat>
+              <v-spacer></v-spacer>
+              <v-btn text small @click="cancelEdit">
+                Отмена
+              </v-btn>
+              <v-btn text small @click="clearForm">
+                Очистить
+              </v-btn>
+              <v-btn text small @click="editChildRubric">
+                Сохранить
+              </v-btn>
+            </v-toolbar>
+          </div>
+
           <div v-if="isUpdateError" class="error">
             <v-alert colored-border type="error" elevation="2">
               <v-list-item-content>
@@ -121,7 +144,7 @@ export default {
       currentObject: {},
       itemsObject: {
         parentKey: 'rubric_name',
-        recursionKey: 'has_child',
+        recursionKey: 'have_child',
         dropdownContent: [],
       },
       isActive: false,
@@ -129,6 +152,9 @@ export default {
       modalMode: 'create',
       isAddFormOpen: false,
       rubricData: {
+        rubric_name: '',
+      },
+      rubricEditData: {
         rubric_name: '',
       },
       rubricChildData: {
@@ -140,13 +166,20 @@ export default {
       isUpdateError: false,
       isAddChildFormOpen: false,
       isDeleteChildFormOpen: false,
+      isEditChildFormOpen: false,
     }
   },
   computed: {
     requestRoute: function () {
       return process.env.VUE_APP_HOST + '/api/news/rubrics';
     },
-    requestDeleteRoute: function () {
+    requestParentRoute: function () {
+      return process.env.VUE_APP_HOST + '/api/news/rubrics/parents';
+    },
+    requestChildrenRoute: function () {
+      return process.env.VUE_APP_HOST + '/api/news/rubrics/' + this.currentObject.id + '/children';
+    },
+    requestUpdateRoute: function () {
       return process.env.VUE_APP_HOST + '/api/news/rubrics/' + this.currentObject.id;
     },
     rubricName: {
@@ -155,6 +188,14 @@ export default {
       },
       set: function (newVal) {
         this.rubricData.rubric_name = newVal;
+      },
+    },
+    rubricEditName: {
+      get: function () {
+        return this.rubricEditData?.rubric_name ?? '';
+      },
+      set: function (newVal) {
+        this.rubricEditData.rubric_name = newVal;
       },
     },
     rubricChildName: {
@@ -169,36 +210,23 @@ export default {
   methods: {
     updateData() {
       this.axios.get(
-        this.requestRoute,
+        this.requestParentRoute,
       ).then(response => {
         if (response.data?.success) {
-          //this.itemsObject.dropdownContent = response?.data?.items;
-          this.itemsObject.dropdownContent = [
-            {
-              id: 1,
-              parent_id: null,
-              rubric_name: 'Родитель 1',
-              has_child: true,
-            },
-            {
-              id: 2,
-              parent_id: null,
-              rubric_name: 'Родитель 2',
-              has_child: true,
-            },
-            {
-              id: 3,
-              parent_id: null,
-              rubric_name: 'Родитель 3',
-              has_child: false,
-            },
-            {
-              id: 4,
-              parent_id: null,
-              rubric_name: 'Родитель 4',
-              has_child: true,
-            }
-          ]
+          this.itemsObject.dropdownContent = response?.data?.items;
+        } else {
+          console.log(response?.data);
+        }
+      }).catch(error => {
+        console.log(error);
+      });
+    },
+    updateChildrenData() {
+      this.axios.get(
+        this.requestChildrenRoute,
+      ).then(response => {
+        if (response.data?.success) {
+          this.itemsObject.dropdownContent = response?.data?.items;
         } else {
           console.log(response?.data);
         }
@@ -209,17 +237,38 @@ export default {
     transmit(data) {
       this.currentObject = data;
       this.rubricChildData.parent_id = data.id;
+      this.rubricEditData.rubric_name = data.rubric_name;
       this.$emit('item-clicked', data);
       this.isActive = true;
+      this.isAddFormOpen = false;
+      if (data.have_child) {
+        this.updateChildrenData();
+      }
     },
     openFormAddParentRubric() {
       this.isAddFormOpen = true;
+      this.isActive = false;
+      this.isDeleteChildFormOpen = false;
+      this.isEditChildFormOpen = false;
+      this.isAddChildFormOpen = false;
     },
     openFormAddChildRubric() {
       this.isAddChildFormOpen = true;
+      this.isDeleteChildFormOpen = false;
+      this.isEditChildFormOpen = false;
+      this.isAddFormOpen = false;
     },
     openFormDeleteChildRubric() {
       this.isDeleteChildFormOpen = true;
+      this.isEditChildFormOpen = false;
+      this.isAddFormOpen = false;
+      this.isAddChildFormOpen = false;
+    },
+    openFormEditChildRubric() {
+      this.isEditChildFormOpen = true;
+      this.isDeleteChildFormOpen = false;
+      this.isAddFormOpen = false;
+      this.isAddChildFormOpen = false;
     },
     addParentRubric() {
       this.isUpdateError = false;
@@ -265,7 +314,7 @@ export default {
     },
     DeleteChildRubric() {
       this.axios.delete(
-        this.requestDeleteRoute,
+        this.requestUpdateRoute,
       ).then(response => {
         if (response.data?.success) {
           this.isDeleteChildFormOpen = false;
@@ -280,14 +329,42 @@ export default {
         console.log(error);
       });
     },
+    editChildRubric() {
+      this.isUpdateError = false;
+      const url = this.requestUpdateRoute;
+      const data = this.rubricEditData;
+
+      this.axios.put(url,
+        { data },
+      ).then(response => {
+        if (response.data?.success) {
+          this.isEditChildFormOpen = false;
+          this.updateData();
+          this.isActive = false;
+        } else {
+          this.isUpdateError = true;
+          this.errorMsg = response?.data.message;
+          this.errors = response?.data.errors;
+          console.log(response?.data);
+        }
+      }).catch(error => {
+        console.log(error);
+      });
+    },
     clearForm() {
       this.isUpdateError = false;
       this.rubricName = '';
+      this.rubricEditName = '';
     },
     cancelForm() {
       this.isUpdateError = false;
       this.rubricName = '';
       this.isAddFormOpen = false;
+    },
+    cancelEdit() {
+      this.isUpdateError = false;
+      this.rubricEditName = this.currentObject.rubric_name;
+      this.isEditChildFormOpen = false;
     },
     cancelDelete() {
       this.isUpdateError = false;
