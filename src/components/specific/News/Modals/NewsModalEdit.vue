@@ -54,11 +54,6 @@ export default {
         }
     },
     watch: {
-        modalMaskClick: function (newVal) {
-            if (newVal) {
-                this.$emit('modal-close-btn-clicked')
-            }
-        },
     },
     data: function () {
         return {
