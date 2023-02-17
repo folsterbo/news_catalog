@@ -5,11 +5,11 @@
             <i class="mdi mdi-circle-small" v-else></i>
             <div class="item-name">{{ item[this.itemsObject.parentKey] }}</div>
 
-            <div class="mdi mdi-chevron-right" v-if="haveChild" :class="{ 'item-open': isOpen }" @click="toggle(item)">
+            <div class="mdi mdi-chevron-right" v-if="haveChild" :class="{ 'item-open': isOpen }" @click="toggle(item)" @item-edited="updateChildrenData()">
             </div>
         </div>
         <ul class="tree-data-main" v-show="isOpen" v-if="haveChild">
-            <tree-data-item v-for="(item, index) in this.itemsObject.dropdownContent" :item="item" :key="index"
+            <tree-data-item v-for="(item, index) in this.itemsObject.dropdownContent" :item="item" :key="index" :updateKey="updateKey"
                 :last-clicked-item-id="lastClickedItemId" :items-object="itemsObject" @item-clicked="itemClickHandler"
                 ></tree-data-item>
         </ul>
@@ -32,6 +32,16 @@ export default {
         },
         lastClickedItemId: {
             type: Number,
+        },
+        updateKey: {
+            type: Number,
+        }
+    },
+    watch: {
+        updateKey: function (newVal) {
+            if (newVal) {
+                this.updateChildrenData();
+            }
         },
     },
     data() {
@@ -68,9 +78,6 @@ export default {
             }).catch(error => {
                 console.log(error);
             });
-        },
-        transmit(event, item) {
-            this.$emit('change-event', event, item);
         },
         itemClickEvent(item) {
             this.$emit('item-clicked', item);
@@ -127,9 +134,7 @@ export default {
 }
 
 .tree-data-main {
-    width: 200px;
-    height: 200px;
-    background-color: aqua;
+
 }
 
 .mdi-chevron-right:hover {

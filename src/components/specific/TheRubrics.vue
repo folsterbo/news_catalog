@@ -5,7 +5,7 @@
         <v-col cols="5">
           <div>
             <tree-data-group @item-clicked="transmit" :tree-data="treeData"
-              :key="updateKey"></tree-data-group>
+              :updateKey="updateKey"></tree-data-group>
           </div>
           <v-btn text :class="{ 'active': isActive }" @click="openFormAddParentRubric" color="info">
             Добавить новую рубрику
@@ -271,6 +271,7 @@ export default {
         if (response.data?.success) {
           this.isAddChildFormOpen = false;
           this.updateData();
+          this.updateKey++;
         } else {
           this.isUpdateError = true;
           this.errorMsg = response?.data.message;
@@ -288,6 +289,7 @@ export default {
         if (response.data?.success) {
           this.isDeleteChildFormOpen = false;
           this.updateData();
+          this.updateKey++;
         } else {
           this.isUpdateError = true;
           this.errorMsg = response?.data.message;
@@ -309,6 +311,7 @@ export default {
         if (response.data?.success) {
           this.isEditChildFormOpen = false;
           this.updateData();
+          this.updateKey++;
           this.isActive = false;
         } else {
           this.isUpdateError = true;

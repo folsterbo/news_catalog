@@ -3,13 +3,12 @@
         <tree-data-item
             v-for="(item, index) in treeData"
             :key="index"
+            :updateKey="updateKey"
             class="tree-data-item"
             :item="item"
             :last-clicked-item-id="lastClickedItemId"
-            @change-event="transmit"
             @item-clicked="itemClickHandler"
             @item-toggle="$emit('item-toggle')"
-            @dropdown-btn-clicked="$emit('dropdown-btn-clicked', $event)"
         ></tree-data-item>
     </div>
 </template>
@@ -26,6 +25,9 @@ export default {
             type: Array,
             required: true,
         },
+        updateKey: {
+            type: Number,
+        }
     },
     data: function () {
         return {
@@ -36,9 +38,6 @@ export default {
         itemClickHandler(item) {
             this.lastClickedItemId = item.id;
             this.$emit('item-clicked', item)
-        },
-        transmit(event, item) {
-            this.$emit(event, item)
         },
     },
 }
